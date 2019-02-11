@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myproject
+  labels:
+    app: myproject
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: myproject
+  template:
+    metadata:
+      labels:
+        app: myproject
+    spec:
+      containers:
+      - name: myproject
+        image: "cloudgrp12/myproject:latest"
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 9301
+      imagePullSecrets:
+      - name: d-acr-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: myproject
+  #annotations:
+    #service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 9301
+      name: http
+  selector:
+    app: myproject
